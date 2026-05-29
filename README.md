@@ -1,214 +1,204 @@
-# PadalaChain
+# PadalaChain 🇵🇭
 
-PadalaChain is a blockchain-powered cross-border remittance platform built on Morph Hoodi Testnet using ERC-20 smart contracts. The project helps Overseas Filipino Workers (OFWs) and Southeast Asian families send funds faster, cheaper, and with transparent budgeting tools.
+> Cross-border OFW remittance with on-chain transparency, category budgeting, and real-time family dashboard — powered by Morph L2.
 
-## Problem
-
-Millions of OFWs rely on traditional remittance services that:
-- charge high transfer fees
-- take hours or days to process
-- provide little transparency
-- lack financial budgeting support
-
-PadalaChain solves this using blockchain-based remittances powered by Morph.
+🔗 **Live Demo:** [padala-chain.vercel.app](https://padala-chain.vercel.app)
+📜 **Explorer:** [explorer-hoodi.morph.network](https://explorer-hoodi.morph.network)
 
 ---
 
-# Features
+## Pitch
 
-- ERC-20 mock stablecoin (mUSDC)
-- Wallet-to-wallet remittance
-- Budget categorization
-- Family budgeting allocation
-- On-chain remittance logs
-- Faucet system for demo testing
-- MetaMask wallet integration
-- Morph Hoodi Testnet deployment
+Over 10 million Overseas Filipino Workers send $36 billion home annually — losing up to ₱1,500 per transfer in fees to traditional services like Western Union and GCash. Families receive money with no visibility into what it is for or how to manage it.
+
+PadalaChain solves this using ERC-20 smart contracts on Morph L2. OFWs connect their MetaMask wallet, tag each transfer with a purpose — Tuition, Bills, Food, or Medical — and send funds on-chain in under 15 seconds at a fraction of the cost. Every transaction is logged immutably on the blockchain and saved to a Supabase database, so families can open their dashboard and see exactly what arrived, when, and why.
+
+This is not just a cheaper wire transfer. It is financial transparency for families who have never had it — powered by blockchain, built for the people who need it most.
 
 ---
 
-# Tech Stack
+## Architecture
 
-## Frontend
-- Next.js
-- Tailwind CSS
-- ethers.js
-
-## Blockchain
-- Solidity
-- OpenZeppelin ERC20
-- Morph Hoodi Testnet
-
-## Wallet
-- MetaMask
-
-## Development Tools
-- Remix IDE
-
----
-
-# Smart Contracts
-
-## PadalaToken.sol
-Mock ERC-20 stablecoin used for remittance transfers.
-
-### Functions
-- `faucet()`
-- `mint()`
-- `approve()`
-- `transfer()`
-
----
-
-## PadalaRemittance.sol
-Main remittance smart contract.
-
-### Features
-- Send remittances
-- Categorize payments
-- Store remittance logs
-- Budget allocation system
-
-### Categories
-| ID | Category |
-|----|----------|
-| 1 | Tuition |
-| 2 | Bills |
-| 3 | Food |
-| 4 | Medical |
-
----
-
-# Architecture
-
-```text
-OFW Sender
-   ↓
-MetaMask Wallet
-   ↓
-Next.js Frontend
-   ↓
-PadalaRemittance Contract
-   ↓
-PadalaToken ERC20
-   ↓
-Morph Hoodi Testnet
-   ↓
-Receiver Wallet
+```
+┌─────────────────────────────────────────────────────────────┐
+│  USER LAYER                                                  │
+│  ┌──────────────────┐              ┌──────────────────────┐  │
+│  │   OFW Sender     │              │   Family Receiver    │  │
+│  │  MetaMask · 2910 │              │  Dashboard · read    │  │
+│  └────────┬─────────┘              └──────────┬───────────┘  │
+└───────────┼──────────────────────────────────┼──────────────┘
+            │                                  │
+┌───────────┼──────────────────────────────────┼──────────────┐
+│  FRONTEND LAYER                              │              │
+│  ┌────────▼──────────────┐   saves   ┌──────▼────────────┐  │
+│  │  Next.js 16 + ethers  │ ────────► │  Supabase client  │  │
+│  │  Tailwind · Vercel    │           │  reads remittances │  │
+│  └────────┬──────────────┘           └──────┬────────────┘  │
+└───────────┼────────────────────────────────┼───────────────┘
+            │ approve + send                 │ reads
+┌───────────┼────────────────────────────────┼───────────────┐
+│  BLOCKCHAIN LAYER                          │               │
+│  ┌────────▼──────────┐  ┌──────────────────▼────────────┐  │
+│  │  PadalaToken.sol  │  │    PadalaRemittance.sol        │  │
+│  │  ERC-20 · mUSDC   │  │  sendRemittance · getMyLogs   │  │
+│  │  faucet()         │  │  category log · on-chain       │  │
+│  └────────┬──────────┘  └──────────────┬─────────────────┘  │
+└───────────┼────────────────────────────┼───────────────────┘
+            │                            │
+┌───────────▼────────────────────────────▼───────────────────┐
+│  INFRA LAYER                                                │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐ │
+│  │    Morph Hoodi L2        │  │       Supabase DB        │ │
+│  │  Chain 2910 · < 15s      │  │  remittances table       │ │
+│  └──────────────────────────┘  └──────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-# Smart Contract Flow
+## Live Deployment
 
-1. User connects MetaMask
-2. User claims demo mUSDC from faucet
-3. User approves remittance contract
-4. User sends remittance
-5. ERC20 tokens transfer to receiver
-6. Transaction logs stored on-chain
-7. Receiver views remittance history
-
----
-
-# Morph Network Configuration
-
-## RPC URL
-```bash
-https://rpc-hoodi.morph.network
-```
-
-## Chain ID
-```bash
-2910
-```
-
-## Currency Symbol
-```bash
-ETH
-```
-
-## Block Explorer
-```bash
-https://explorer-hoodi.morph.network
-```
+| Resource | Link |
+|---|---|
+| Frontend | [padala-chain.vercel.app](https://padala-chain.vercel.app) |
+| PadalaToken (mUSDC) | `0xb1B20A4521919C38Cd84579D913C59a32B3A0510` |
+| PadalaRemittance | `0x4dC94C0e9Dc6a6C98862898282418e451Fa636Ad` |
+| Network | Morph Hoodi Testnet · Chain ID 2910 |
+| Explorer | [explorer-hoodi.morph.network](https://explorer-hoodi.morph.network) |
 
 ---
 
-# Installation
+## Tech Stack
 
-## Clone Repository
+| Layer | Technology |
+|---|---|
+| Blockchain | Morph Hoodi Testnet (Chain 2910) |
+| Smart Contracts | Solidity 0.8.20 + OpenZeppelin v5 |
+| Token Standard | ERC-20 (mock stablecoin — mUSDC) |
+| Contract IDE | Remix IDE |
+| Frontend | Next.js 16 + Tailwind CSS |
+| Wallet | MetaMask + ethers.js v6 |
+| Database | Supabase (off-chain metadata) |
+| Deployment | Vercel |
+
+---
+
+## Smart Contracts
+
+### PadalaToken.sol — Mock Stablecoin (mUSDC)
+
+| Function | Description |
+|---|---|
+| `faucet()` | Mint 500 mUSDC to caller — for demo |
+| `approve(spender, amount)` | Authorize remittance contract |
+| `mint(address, amount)` | Owner-only mint |
+
+### PadalaRemittance.sol — Core Logic
+
+| Function | Description |
+|---|---|
+| `sendRemittance(receiver, amount, category)` | Transfer + log on-chain |
+| `getMyLogs(address)` | Read all remittances for a receiver |
+| `setBudget(tuition, bills, food, medical)` | Set family budget split |
+| `totalLogs()` | Total remittances ever sent |
+
+**Category IDs:** `1` Tuition 🎓 · `2` Bills 🏠 · `3` Food 🍚 · `4` Medical 💊
+
+---
+
+## Getting Started
+
+### Add Morph Hoodi to MetaMask
+
+| Field | Value |
+|---|---|
+| Network name | Morph Hoodi |
+| RPC URL | `https://rpc-hoodi.morph.network` |
+| Chain ID | `2910` |
+| Currency symbol | ETH |
+| Block explorer | `https://explorer-hoodi.morph.network` |
+
+### Install & Run
 
 ```bash
-git clone https://github.com/yourusername/padalachain.git
-cd padalachain
-```
-
-## Install Dependencies
-
-```bash
+git clone https://github.com/jelobarasi23-a11y/PadalaChain.git
+cd PadalaChain
 npm install
 ```
 
-## Run Development Server
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_TOKEN_ADDRESS=0xb1B20A4521919C38Cd84579D913C59a32B3A0510
+NEXT_PUBLIC_REMITTANCE_ADDRESS=0x4dC94C0e9Dc6a6C98862898282418e451Fa636Ad
+NEXT_PUBLIC_CHAIN_ID=2910
+NEXT_PUBLIC_RPC_URL=https://rpc-hoodi.morph.network
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
 ```bash
 npm run dev
 ```
 
----
+### Supabase Setup
 
-# Deploy Smart Contracts
-
-## Using Remix IDE
-
-1. Open Remix IDE
-2. Compile `PadalaToken.sol`
-3. Deploy token contract
-4. Copy token contract address
-5. Compile `PadalaRemittance.sol`
-6. Deploy remittance contract using token address
+1. Create project at [supabase.com](https://supabase.com) — Singapore region
+2. SQL Editor → paste `schema.sql` → Run
+3. Copy URL and anon key → add to `.env.local`
 
 ---
 
-# Demo Workflow
+## Demo Flow
 
-## Sender
-- Connect wallet
-- Claim faucet tokens
-- Approve remittance contract
-- Send categorized remittance
-
-## Receiver
-- Receive mUSDC
-- View remittance logs
-- Track budgeting categories
-
----
-
-# Why It Matters
-
-PadalaChain demonstrates how blockchain can improve financial accessibility in the Philippines and Southeast Asia by reducing remittance friction and increasing transparency for OFW families.
+```
+1. Open padala-chain.vercel.app
+2. Connect MetaMask on Morph Hoodi (Chain 2910)
+3. Call faucet() in Remix → get 500 mUSDC
+4. Fill receiver + amount + category → Send on-chain
+   → MetaMask popup 1: Approve mUSDC
+   → MetaMask popup 2: Send remittance
+5. Confirmed on Morph Hoodi in < 15s
+6. Auto-saved to Supabase
+7. Family loads dashboard → sees real-time log
+```
 
 ---
 
-# Future Improvements
+## Fee Comparison
 
-- QR remittance claiming
-- Real stablecoin integration
-- GCash cash-out support
-- AI budgeting insights
-- Scheduled remittance automation
-- Multi-language support
-
----
-
-# Team
-
-Built for the Morph Hackathon.
+| Service | Fee on ₱48,500 | Speed |
+|---|---|---|
+| Western Union | ₱1,500 | 1–3 days |
+| GCash Padala | ₱1,200 | Hours |
+| **PadalaChain** | **₱240** | **< 15 seconds** |
+| **Savings** | **₱1,260 (84%)** | — |
 
 ---
 
-# License
+## Roadmap
 
-MIT License
+| Feature | Status |
+|---|---|
+| ERC-20 mock stablecoin (mUSDC) | ✅ Live |
+| On-chain remittance logging | ✅ Live |
+| Category tagging (4 types) | ✅ Live |
+| MetaMask + ethers.js v6 | ✅ Live |
+| Supabase off-chain metadata | ✅ Live |
+| Vercel deployment | ✅ Live |
+| Family dashboard + breakdown | ✅ Live |
+| Scheduled remittance | 🔜 Planned |
+| Real stablecoin (USDC) | 🔜 Planned |
+| QR code for receiver | 🔜 Planned |
+| AI budgeting insights | 🔜 Planned |
+| Mobile app | 🔜 Planned |
+
+---
+
+## License
+
+MIT — built for the Morph Hackathon.
+
+---
+
+*Built with ❤️ for OFW families 🇵🇭*
