@@ -1,4 +1,6 @@
 import "./globals.css";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export const metadata = {
   title: "PadalaChain — OFW Remittance on Morph L2",
@@ -13,7 +15,11 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
