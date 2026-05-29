@@ -55,7 +55,7 @@ export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
             <div style={{ background:"var(--green-light)", border:"2px solid var(--green-border)", borderRadius:"16px", padding:"18px" }}>
               <div style={{ fontSize:"12px", fontWeight:"700", color:"rgba(0,140,80,0.7)", marginBottom:"8px", fontFamily:"var(--font-body)" }}>💰 TOTAL RECEIVED</div>
               <div style={{ fontSize:"28px", fontWeight:"800", color:"var(--green)", letterSpacing:"-0.8px", fontFamily:"var(--font-display)" }}>
-                {total.toFixed(0)} <span style={{ fontSize:"14px", fontWeight:"600" }}>mUSDC</span>
+                {total.toFixed(2)} <span style={{ fontSize:"14px", fontWeight:"600" }}>mUSDC</span>
               </div>
             </div>
             <div style={{ background:"#EEF2FF", border:"2px solid #C7D2FE", borderRadius:"16px", padding:"18px" }}>
@@ -72,7 +72,7 @@ export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
                   <div key={c.id}>
                     <div style={{ display:"flex", justifyContent:"space-between", fontSize:"14px", marginBottom:"6px" }}>
                       <span style={{ color:"var(--text)", fontWeight:"600", fontFamily:"var(--font-body)" }}>{c.emoji} {c.label}</span>
-                      <span style={{ color:c.color, fontWeight:"800", fontFamily:"var(--font-display)", letterSpacing:"-0.3px" }}>{c.sum.toFixed(0)} mUSDC</span>
+                      <span style={{ color:c.color, fontWeight:"800", fontFamily:"var(--font-display)", letterSpacing:"-0.3px" }}>{c.sum.toFixed(2)} mUSDC</span>
                     </div>
                     <div style={{ height:"8px", background:"var(--border)", borderRadius:"4px", overflow:"hidden" }}>
                       <div style={{
@@ -132,7 +132,7 @@ export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"5px" }}>
                   <span style={{ fontSize:"18px", fontWeight:"800", color:"var(--text)", fontFamily:"var(--font-display)", letterSpacing:"-0.5px" }}>
-                    {parseFloat(l.amount).toFixed(0)}
+                    {parseFloat(l.amount).toFixed(2)}
                     <span style={{ fontSize:"12px", fontWeight:"600", color:"var(--text-muted)", marginLeft:"4px" }}>mUSDC</span>
                   </span>
                   <span style={{ fontSize:"12px", color:c.color, background:c.bg, padding:"3px 12px", borderRadius:"16px", fontWeight:"700", fontFamily:"var(--font-body)" }}>
@@ -149,7 +149,7 @@ export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
                 )}
               </div>
               <div style={{ fontSize:"18px", fontWeight:"800", color:c.color, flexShrink:0, fontFamily:"var(--font-display)", letterSpacing:"-0.5px" }}>
-                +{parseFloat(l.amount).toFixed(0)}
+                +{parseFloat(l.amount).toFixed(2)}
               </div>
             </div>
           );
