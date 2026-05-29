@@ -5,7 +5,7 @@ import FamilyDashboard from "../components/FamilyDashboard";
 import Link from "next/link";
 
 /* ── animated counter ── */
-function Counter({ target, suffix = "", duration = 1800 }) {
+function Counter({ target, suffix = "", duration = 1800, decimals = 0 }) {
   const [value, setValue] = useState(0);
   const ref = useRef(null);
   useEffect(() => {
@@ -16,23 +16,23 @@ function Counter({ target, suffix = "", duration = 1800 }) {
       function step(ts) {
         if (!start) start = ts;
         const prog = Math.min((ts - start) / duration, 1);
-        setValue(Math.floor(prog * target));
+        setValue(parseFloat((prog * target).toFixed(decimals)));
         if (prog < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
     }, { threshold: 0.3 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [target, duration]);
-  return <span ref={ref}>{value.toLocaleString()}{suffix}</span>;
+  }, [target, duration, decimals]);
+  return <span ref={ref}>{value.toLocaleString("en-PH", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}</span>;
 }
 
 /* ── live ticker ── */
 const TICKER_ITEMS = [
-  "🇵🇭 OFW from Dubai just sent ₱12,400 for Tuition",
+  "🇵🇭 OFW from Dubai just sent ₱12,400.00 for Tuition",
   "🇸🇦 Transfer to Cebu confirmed in 9 seconds",
   "🇦🇪 Family in Iloilo received Medical funds",
-  "🇸🇬 Singapore OFW saved ₱1,260 vs. Western Union",
+  "🇸🇬 Singapore OFW saved ₱1,260.00 vs. Western Union",
   "🇯🇵 Tokyo → Davao Bills payment on-chain",
   "🇭🇰 Hong Kong OFW sent Food money in < 15s",
   "🇺🇸 US → Manila transfer: 0 bank fees",
@@ -96,8 +96,8 @@ export default function Home() {
               fontFamily: "var(--font-body)",
             }}>
               Cheaper and faster than banks or remittance centers. Cut transfer fees from{" "}
-              <span style={{ color: "#FF7070", fontWeight: "700" }}>₱1,500</span> down to just{" "}
-              <span style={{ color: "#6EFFC1", fontWeight: "700" }}>₱240</span> — in under 15 seconds.
+              <span style={{ color: "#FF7070", fontWeight: "700" }}>₱1,500.00</span> down to just{" "}
+              <span style={{ color: "#6EFFC1", fontWeight: "700" }}>₱240.00</span> — in under 15 seconds.
             </p>
 
             {/* Stats */}
@@ -105,7 +105,7 @@ export default function Home() {
               {[
                 { val: "84", suffix: "%", label: "Lower fees" },
                 { val: "15", suffix: "s", label: "Transfer time" },
-                { val: "1260", suffix: "", label: "₱ Avg savings", prefix: "₱" },
+                { val: "1260", suffix: ".00", label: "₱ Avg savings", prefix: "₱" },
               ].map((s, i) => (
                 <div key={i}>
                   <div style={{ fontSize: "30px", fontWeight: "800", fontFamily: "var(--font-display)", color: "#6EFFC1", letterSpacing: "-0.5px" }}>
@@ -147,12 +147,12 @@ export default function Home() {
             boxShadow: "0 24px 64px rgba(0,0,0,0.3)", color: "var(--text)",
           }}>
             <div style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-muted)", marginBottom: "20px", fontFamily: "var(--font-body)", letterSpacing: "0.5px" }}>
-              FEE COMPARISON — ₱48,500 SENT
+              FEE COMPARISON — ₱48,500.00 SENT
             </div>
             {[
-              { name: "Western Union / GCash", fee: "₱1,500", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA", icon: "🏦" },
-              { name: "Bank Wire Transfer",    fee: "₱1,200", color: "#D97706", bg: "#FFFBEB", border: "#FDE68A", icon: "🏧" },
-              { name: "PadalaChain",           fee: "₱240",   color: "#00B67A", bg: "#E8FAF2", border: "#A7D9C0", badge: "SAVE ₱1,260", icon: "⛓️" },
+              { name: "Western Union / GCash", fee: "₱1,500.00", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA", icon: "🏦" },
+              { name: "Bank Wire Transfer",    fee: "₱1,200.00", color: "#D97706", bg: "#FFFBEB", border: "#FDE68A", icon: "🏧" },
+              { name: "PadalaChain",           fee: "₱240.00",   color: "#00B67A", bg: "#E8FAF2", border: "#A7D9C0", badge: "SAVE ₱1,260.00", icon: "⛓️" },
             ].map((r, i) => (
               <div key={i} style={{
                 background: r.bg, border: `2px solid ${r.border}`,
@@ -303,7 +303,7 @@ export default function Home() {
         }}>
           <div>
             <div style={{ fontSize: "28px", fontWeight: "800", color: "#fff", fontFamily: "var(--font-display)", letterSpacing: "-0.5px", marginBottom: "10px" }}>
-              Ready to save ₱1,260 on your next remittance?
+              Ready to save ₱1,260.00 on your next remittance?
             </div>
             <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.65)", fontFamily: "var(--font-body)", fontWeight: "500" }}>
               Join OFWs who already send money home without the fees.
