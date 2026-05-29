@@ -3,20 +3,21 @@ import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
 const CAT = {
-  1:{ label:"Tuition", emoji:"🎓", color:"#1D9E75", bg:"rgba(29,158,117,0.12)"  },
-  2:{ label:"Bills",   emoji:"🏠", color:"#89b4fa", bg:"rgba(137,180,250,0.12)" },
-  3:{ label:"Food",    emoji:"🍚", color:"#EF9F27", bg:"rgba(239,159,39,0.12)"  },
-  4:{ label:"Medical", emoji:"💊", color:"#D4537E", bg:"rgba(212,83,126,0.12)"  },
+  1:{ label:"Tuition", emoji:"🎓", color:"#00E5A0", bg:"rgba(0,229,160,0.1)",   border:"rgba(0,229,160,0.2)"   },
+  2:{ label:"Bills",   emoji:"🏠", color:"#3B9EFF", bg:"rgba(59,158,255,0.1)",  border:"rgba(59,158,255,0.2)"  },
+  3:{ label:"Food",    emoji:"🍚", color:"#FFB547", bg:"rgba(255,181,71,0.1)",  border:"rgba(255,181,71,0.2)"  },
+  4:{ label:"Medical", emoji:"💊", color:"#FF6EB4", bg:"rgba(255,110,180,0.1)", border:"rgba(255,110,180,0.2)" },
 };
 
-export default function FamilyDashboard({ familyAddress }) {
+const FAMILY_ADDRESS = "0x3A7475E964B5babE75D9a62D81f0ae8974Cc91d4";
+
+export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
   const [logs,    setLogs]    = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded,  setLoaded]  = useState(false);
   const [error,   setError]   = useState("");
 
   async function fetchLogs() {
-    if (!supabase) { setError("Supabase not configured"); return; }
     setLoading(true); setError("");
     try {
       const { data, error: err } = await supabase
@@ -26,78 +27,135 @@ export default function FamilyDashboard({ familyAddress }) {
         .order("created_at", { ascending: false });
 
       if (err) throw err;
-
-      setLogs(data.map(r => ({
-        sender:   r.sender,
-        amount:   r.amount,
-        category: r.category,
-        label:    r.category_label,
-        date:     new Date(r.created_at).toLocaleDateString("en-PH", {
-          month:"short", day:"numeric", year:"numeric"
-        }),
-        txHash:   r.tx_hash,
-      })));
+      setLogs(data);
       setLoaded(true);
     } catch(e) {
-      setError("Could not load: " + e.message);
+      setError(e.message);
     } finally { setLoading(false); }
   }
 
-  const total = logs.reduce((sum, l) => sum + parseFloat(l.amount), 0);
+  const total = logs.reduce((sum, l) => sum + parseFloat(l.amount || 0), 0);
+
+  // Category breakdown
+  const breakdown = [1,2,3,4].map(id => ({
+    ...CAT[id],
+    id,
+    count: logs.filter(l => l.category === id).length,
+    sum:   logs.filter(l => l.category === id).reduce((s,l) => s + parseFloat(l.amount||0), 0),
+  })).filter(c => c.count > 0);
 
   return (
     <div>
+      {/* Summary */}
       {loaded && logs.length > 0 && (
-        <div style={{
-          display:"grid", gridTemplateColumns:"1fr 1fr",
-          gap:"8px", marginBottom:"16px",
-        }}>
+        <>
           <div style={{
-            background:"rgba(29,158,117,0.08)", border:"0.5px solid rgba(29,158,117,0.2)",
-            borderRadius:"12px", padding:"12px",
+            display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"12px",
           }}>
-            <div style={{ fontSize:"10px", color:"#4b5563", marginBottom:"3px" }}>TOTAL RECEIVED</div>
-            <div style={{ fontSize:"18px", fontWeight:"700", color:"#1D9E75" }}>
-              {total.toFixed(0)} mUSDC
+            <div style={{
+              background:"var(--green-dim)", border:"0.5px solid var(--green-border)",
+              borderRadius:"10px", padding:"14px",
+            }}>
+              <div style={{
+                fontSize:"10px", fontFamily:"var(--font-mono)",
+                color:"rgba(0,229,160,0.6)", marginBottom:"4px", letterSpacing:"0.5px",
+              }}>TOTAL RECEIVED</div>
+              <div style={{ fontSize:"22px", fontWeight:"800", color:"#00E5A0", letterSpacing:"-1px" }}>
+                {total.toFixed(0)} <span style={{ fontSize:"12px", fontWeight:"500" }}>mUSDC</span>
+              </div>
+            </div>
+            <div style={{
+              background:"rgba(59,158,255,0.08)", border:"0.5px solid rgba(59,158,255,0.2)",
+              borderRadius:"10px", padding:"14px",
+            }}>
+              <div style={{
+                fontSize:"10px", fontFamily:"var(--font-mono)",
+                color:"rgba(59,158,255,0.6)", marginBottom:"4px", letterSpacing:"0.5px",
+              }}>TRANSACTIONS</div>
+              <div style={{ fontSize:"22px", fontWeight:"800", color:"#3B9EFF", letterSpacing:"-1px" }}>
+                {logs.length}
+              </div>
             </div>
           </div>
-          <div style={{
-            background:"rgba(137,180,250,0.08)", border:"0.5px solid rgba(137,180,250,0.2)",
-            borderRadius:"12px", padding:"12px",
-          }}>
-            <div style={{ fontSize:"10px", color:"#4b5563", marginBottom:"3px" }}>TRANSACTIONS</div>
-            <div style={{ fontSize:"18px", fontWeight:"700", color:"#89b4fa" }}>{logs.length}</div>
-          </div>
-        </div>
+
+          {/* Breakdown bars */}
+          {breakdown.length > 0 && (
+            <div style={{
+              background:"rgba(255,255,255,0.02)",
+              border:"0.5px solid var(--border)",
+              borderRadius:"10px", padding:"12px 14px", marginBottom:"12px",
+            }}>
+              <div style={{
+                fontSize:"10px", fontFamily:"var(--font-mono)",
+                color:"var(--text-muted)", marginBottom:"10px", letterSpacing:"0.5px",
+              }}>BREAKDOWN</div>
+              <div style={{ display:"grid", gap:"8px" }}>
+                {breakdown.map(c => (
+                  <div key={c.id}>
+                    <div style={{
+                      display:"flex", justifyContent:"space-between",
+                      fontSize:"11px", marginBottom:"4px",
+                    }}>
+                      <span style={{ color:"var(--text-dim)" }}>{c.emoji} {c.label}</span>
+                      <span style={{ color:c.color, fontFamily:"var(--font-mono)", fontWeight:"600" }}>
+                        {c.sum.toFixed(0)} mUSDC
+                      </span>
+                    </div>
+                    <div style={{
+                      height:"3px", background:"rgba(255,255,255,0.06)",
+                      borderRadius:"2px", overflow:"hidden",
+                    }}>
+                      <div style={{
+                        height:"100%", borderRadius:"2px",
+                        background:c.color,
+                        width:`${total > 0 ? (c.sum/total*100).toFixed(0) : 0}%`,
+                        boxShadow:`0 0 8px ${c.color}`,
+                        transition:"width 0.6s ease",
+                      }}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <button onClick={fetchLogs} disabled={loading} style={{
-        width:"100%", padding:"11px", borderRadius:"12px",
-        background:"rgba(137,180,250,0.08)", color:"#89b4fa",
-        border:"0.5px solid rgba(137,180,250,0.2)",
-        fontSize:"13px", fontWeight:"500", cursor:"pointer",
-        marginBottom:"14px", fontFamily:"inherit", transition:"all 0.15s",
+        width:"100%", padding:"12px", borderRadius:"10px",
+        background: loaded ? "rgba(59,158,255,0.08)" : "rgba(59,158,255,0.12)",
+        color:"#3B9EFF",
+        border:"0.5px solid rgba(59,158,255,0.2)",
+        fontSize:"13px", fontWeight:"600", cursor:"pointer",
+        marginBottom:"12px", fontFamily:"var(--font-display)",
+        transition:"all 0.2s",
       }}>
         {loading ? "Loading..." : loaded ? "↻ Refresh" : "Load remittances"}
       </button>
 
       {error && (
         <div style={{
-          padding:"10px 12px", borderRadius:"10px", fontSize:"12px",
-          background:"rgba(239,68,68,0.1)", border:"0.5px solid rgba(239,68,68,0.3)",
-          color:"#ef4444", marginBottom:"10px",
+          padding:"10px 12px", borderRadius:"10px",
+          background:"rgba(255,92,92,0.08)", border:"0.5px solid rgba(255,92,92,0.2)",
+          color:"#FF5C5C", fontSize:"12px", fontFamily:"var(--font-mono)",
+          marginBottom:"10px",
         }}>{error}</div>
       )}
 
       {loaded && logs.length === 0 && !error && (
         <div style={{
-          padding:"24px", textAlign:"center",
-          border:"0.5px dashed rgba(255,255,255,0.08)", borderRadius:"12px",
+          padding:"28px", textAlign:"center",
+          border:"0.5px dashed var(--border)", borderRadius:"12px",
         }}>
-          <div style={{ fontSize:"24px", marginBottom:"8px" }}>📭</div>
-          <div style={{ fontSize:"13px", color:"#4b5563" }}>No remittances yet.</div>
-          <div style={{ fontSize:"12px", color:"#374151", marginTop:"4px" }}>
-            Send one from the left panel!
+          <div style={{ fontSize:"28px", marginBottom:"10px" }}>📭</div>
+          <div style={{ fontSize:"13px", color:"var(--text-dim)", fontWeight:"600" }}>
+            No remittances yet
+          </div>
+          <div style={{
+            fontSize:"11px", color:"var(--text-muted)",
+            marginTop:"4px", fontFamily:"var(--font-mono)",
+          }}>
+            Send one from the left panel
           </div>
         </div>
       )}
@@ -108,42 +166,58 @@ export default function FamilyDashboard({ familyAddress }) {
           return (
             <div key={i} style={{
               background:"rgba(255,255,255,0.02)",
-              border:"0.5px solid rgba(255,255,255,0.07)",
-              borderRadius:"14px", padding:"14px",
+              border:`0.5px solid ${c.border}`,
+              borderRadius:"12px", padding:"12px 14px",
               display:"flex", alignItems:"center", gap:"12px",
+              transition:"all 0.15s",
             }}>
               <div style={{
-                width:"40px", height:"40px", borderRadius:"12px",
-                background: c.bg, display:"flex",
-                alignItems:"center", justifyContent:"center",
+                width:"38px", height:"38px", borderRadius:"10px",
+                background:c.bg, border:`0.5px solid ${c.border}`,
+                display:"flex", alignItems:"center", justifyContent:"center",
                 fontSize:"18px", flexShrink:0,
               }}>{c.emoji}</div>
 
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"6px", marginBottom:"3px" }}>
-                  <span style={{ fontSize:"13px", fontWeight:"600", color:"#f0f0f8" }}>
-                    {parseFloat(l.amount).toFixed(0)} mUSDC
+                  <span style={{
+                    fontSize:"14px", fontWeight:"700",
+                    color:"var(--text)", letterSpacing:"-0.3px",
+                  }}>
+                    {parseFloat(l.amount).toFixed(0)}
+                    <span style={{ fontSize:"11px", fontWeight:"500", color:"var(--text-dim)", marginLeft:"3px" }}>mUSDC</span>
                   </span>
                   <span style={{
-                    fontSize:"10px", color: c.color, background: c.bg,
-                    padding:"2px 7px", borderRadius:"20px", fontWeight:"500",
-                  }}>{l.label}</span>
+                    fontSize:"10px", color:c.color, background:c.bg,
+                    padding:"2px 8px", borderRadius:"4px",
+                    fontWeight:"600", fontFamily:"var(--font-mono)",
+                  }}>{l.category_label?.toUpperCase()}</span>
                 </div>
-                <div style={{ fontSize:"11px", color:"#4b5563" }}>
-                  From {l.sender.slice(0,6)}...{l.sender.slice(-4)} · {l.date}
+                <div style={{
+                  fontSize:"10px", color:"var(--text-muted)",
+                  fontFamily:"var(--font-mono)",
+                }}>
+                  FROM {l.sender?.slice(0,8)}...{l.sender?.slice(-6)} ·{" "}
+                  {new Date(l.created_at).toLocaleDateString("en-PH", {
+                    month:"short", day:"numeric",
+                  })}
                 </div>
-                {l.txHash && (
-                  <a href={`https://explorer-hoodi.morph.network/tx/${l.txHash}`}
+                {l.tx_hash && (
+                  <a href={`https://explorer-hoodi.morph.network/tx/${l.tx_hash}`}
                     target="_blank" style={{
-                      fontSize:"10px", color:"#89b4fa",
-                      textDecoration:"none", display:"block", marginTop:"3px",
+                      fontSize:"10px", color:"var(--blue)",
+                      textDecoration:"none", fontFamily:"var(--font-mono)",
+                      display:"block", marginTop:"2px",
                     }}>
-                    {l.txHash.slice(0,10)}... ↗
+                    {l.tx_hash.slice(0,12)}... ↗
                   </a>
                 )}
               </div>
 
-              <div style={{ fontSize:"13px", fontWeight:"700", color: c.color, flexShrink:0 }}>
+              <div style={{
+                fontSize:"14px", fontWeight:"800",
+                color:c.color, flexShrink:0, letterSpacing:"-0.5px",
+              }}>
                 +{parseFloat(l.amount).toFixed(0)}
               </div>
             </div>
