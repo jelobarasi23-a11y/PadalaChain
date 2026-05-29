@@ -124,7 +124,7 @@ export default function SendRemittance() {
             color:"var(--green)", whiteSpace:"nowrap",
             fontFamily:"var(--font-display)", fontWeight:"800", letterSpacing:"-0.3px",
           }}>
-            ≈ ₱{amount ? Math.round(parseFloat(amount)*57).toLocaleString() : "0"}
+            ≈ ₱{amount ? (parseFloat(amount)*57).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "0.00"}
           </div>
         </div>
       </div>
