@@ -3,205 +3,339 @@ import FamilyDashboard from "../components/FamilyDashboard";
 
 export default function Home() {
   return (
-    <main style={{
-      minHeight: "100vh",
-      background: "#080810",
-      backgroundImage: `
-        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(29,158,117,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(55,138,221,0.08) 0%, transparent 60%)
-      `,
-      fontFamily: "'DM Sans', -apple-system, sans-serif",
-      color: "#f0f0f8",
-      padding: "0 0 80px",
-    }}>
+    <main style={{ position:"relative", zIndex:1, minHeight:"100vh", paddingBottom:"80px" }}>
 
-      {/* NAV */}
-      <nav style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "20px 40px", borderBottom: "0.5px solid rgba(255,255,255,0.06)",
-        backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(8,8,16,0.8)",
+      {/* ── NAV ── */}
+      <nav className="fade-up fade-up-1" style={{
+        display:"flex", alignItems:"center", justifyContent:"space-between",
+        padding:"18px 40px",
+        borderBottom:"0.5px solid var(--border)",
+        backdropFilter:"blur(20px)",
+        background:"rgba(5,5,8,0.7)",
+        position:"sticky", top:0, zIndex:100,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
           <div style={{
-            width: "32px", height: "32px", borderRadius: "10px",
-            background: "linear-gradient(135deg, #1D9E75, #0d6e52)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "16px",
+            width:"34px", height:"34px", borderRadius:"10px",
+            background:"linear-gradient(135deg, #00E5A0 0%, #00A373 100%)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:"18px", fontWeight:"800", color:"#050508",
+            boxShadow:"0 0 20px rgba(0,229,160,0.3)",
           }}>₱</div>
-          <span style={{ fontSize: "16px", fontWeight: "600", letterSpacing: "-0.3px" }}>
-            PadalaChain
-          </span>
+          <div>
+            <div style={{ fontSize:"15px", fontWeight:"700", letterSpacing:"-0.5px", lineHeight:1 }}>
+              PadalaChain
+            </div>
+            <div style={{ fontSize:"10px", color:"var(--text-dim)", letterSpacing:"0.5px", fontFamily:"var(--font-mono)" }}>
+              OFW REMITTANCE PROTOCOL
+            </div>
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{
-            fontSize: "11px", background: "rgba(29,158,117,0.15)",
-            color: "#1D9E75", padding: "4px 12px", borderRadius: "20px",
-            border: "0.5px solid rgba(29,158,117,0.3)", fontWeight: "500",
-            letterSpacing: "0.3px",
-          }}>● MORPH HOODI</span>
+
+        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+          <div style={{
+            display:"flex", alignItems:"center", gap:"6px",
+            fontSize:"11px", fontFamily:"var(--font-mono)",
+            color:"var(--green)", background:"var(--green-dim)",
+            border:"0.5px solid var(--green-border)",
+            padding:"5px 12px", borderRadius:"6px", fontWeight:"500",
+          }}>
+            <span className="blink" style={{
+              width:"6px", height:"6px", borderRadius:"50%",
+              background:"var(--green)", display:"inline-block",
+            }}/>
+            MORPH HOODI · 2910
+          </div>
         </div>
       </nav>
 
-      {/* HERO */}
-      <div style={{
-        textAlign: "center", padding: "64px 20px 48px",
-        maxWidth: "600px", margin: "0 auto",
+      {/* ── HERO ── */}
+      <div className="fade-up fade-up-2" style={{
+        padding:"72px 40px 56px",
+        maxWidth:"920px", margin:"0 auto",
       }}>
         <div style={{
-          display: "inline-block", fontSize: "11px", fontWeight: "500",
-          color: "#89b4fa", background: "rgba(137,180,250,0.1)",
-          border: "0.5px solid rgba(137,180,250,0.2)",
-          padding: "5px 14px", borderRadius: "20px", marginBottom: "20px",
-          letterSpacing: "0.5px",
+          display:"inline-flex", alignItems:"center", gap:"8px",
+          fontSize:"11px", fontFamily:"var(--font-mono)",
+          color:"var(--blue)", background:"rgba(59,158,255,0.08)",
+          border:"0.5px solid rgba(59,158,255,0.2)",
+          padding:"5px 14px", borderRadius:"6px",
+          marginBottom:"24px", letterSpacing:"1px",
         }}>
-          BLOCKCHAIN-POWERED REMITTANCE
+          ⬡ HACKATHON BUILD · MORPH L2
         </div>
-        <h1 style={{
-          fontSize: "clamp(36px, 6vw, 56px)", fontWeight: "700",
-          lineHeight: "1.1", letterSpacing: "-1.5px", marginBottom: "16px",
-          background: "linear-gradient(135deg, #ffffff 0%, #a0a0c0 100%)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+
+        <h1 className="shimmer-text" style={{
+          fontSize:"clamp(48px, 8vw, 72px)", fontWeight:"800",
+          lineHeight:"1.0", letterSpacing:"-3px",
+          marginBottom:"20px", maxWidth:"700px",
         }}>
           Send money home.<br />Keep every peso.
         </h1>
+
         <p style={{
-          fontSize: "16px", color: "#6b7280", lineHeight: "1.7", marginBottom: "0",
+          fontSize:"16px", color:"var(--text-dim)", lineHeight:"1.7",
+          maxWidth:"540px", marginBottom:"0",
+          fontWeight:"400",
         }}>
-          OFW remittances with full transparency, category tracking,
-          and on-chain proof — powered by Morph L2.
+          Blockchain remittances for OFWs — transparent, categorized,
+          and on-chain. Cut fees from <span style={{ color:"var(--red)", fontWeight:"600" }}>₱1,500</span> to{" "}
+          <span style={{ color:"var(--green)", fontWeight:"600" }}>₱240</span> per transfer.
         </p>
       </div>
 
-      {/* STATS BAR */}
-      <div style={{
-        display: "flex", justifyContent: "center", gap: "0",
-        maxWidth: "600px", margin: "0 auto 48px",
-        background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.07)",
-        borderRadius: "16px", overflow: "hidden",
+      {/* ── STATS ── */}
+      <div className="fade-up fade-up-2" style={{
+        maxWidth:"920px", margin:"0 auto 40px",
+        padding:"0 40px",
+        display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"10px",
       }}>
         {[
-          { label: "Avg fee saved", value: "₱1,260", sub: "vs Western Union" },
-          { label: "Settlement", value: "< 15s", sub: "on Morph L2" },
-          { label: "Categories", value: "4", sub: "Tuition · Bills · Food · Medical" },
+          { val:"₱1,260",  label:"Avg fee saved",    sub:"per ₱48,500 sent",  color:"var(--green)" },
+          { val:"< 15s",   label:"Settlement time",  sub:"on Morph L2",       color:"var(--blue)"  },
+          { val:"84%",     label:"Fee reduction",    sub:"vs Western Union",  color:"var(--amber)" },
+          { val:"4",       label:"Budget categories",sub:"Tuition · Bills · Food · Medical", color:"var(--pink)" },
         ].map((s, i) => (
           <div key={i} style={{
-            flex: 1, padding: "20px 16px", textAlign: "center",
-            borderRight: i < 2 ? "0.5px solid rgba(255,255,255,0.07)" : "none",
+            background:"var(--surface)",
+            border:"0.5px solid var(--border)",
+            borderRadius:"12px", padding:"18px 20px",
+            position:"relative", overflow:"hidden",
           }}>
-            <div style={{ fontSize: "22px", fontWeight: "700", color: "#f0f0f8", letterSpacing: "-0.5px" }}>
-              {s.value}
+            <div style={{
+              position:"absolute", top:0, left:0, right:0, height:"2px",
+              background:`linear-gradient(90deg, transparent, ${s.color}, transparent)`,
+              opacity:0.6,
+            }}/>
+            <div className="stat-value" style={{
+              fontSize:"26px", fontWeight:"800",
+              color: s.color, letterSpacing:"-1px", lineHeight:1,
+              marginBottom:"6px",
+            }}>{s.val}</div>
+            <div style={{ fontSize:"12px", fontWeight:"600", color:"var(--text)", marginBottom:"2px" }}>
+              {s.label}
             </div>
-            <div style={{ fontSize: "11px", color: "#4b5563", marginTop: "2px" }}>{s.label}</div>
-            <div style={{ fontSize: "10px", color: "#374151", marginTop: "1px" }}>{s.sub}</div>
+            <div style={{ fontSize:"10px", color:"var(--text-muted)", fontFamily:"var(--font-mono)" }}>
+              {s.sub}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* MAIN GRID */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr",
-        gap: "16px", maxWidth: "900px", margin: "0 auto",
-        padding: "0 20px",
+      {/* ── MAIN GRID ── */}
+      <div className="fade-up fade-up-3" style={{
+        maxWidth:"920px", margin:"0 auto",
+        padding:"0 40px",
+        display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px",
       }}>
-
         {/* SEND CARD */}
-        <div style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "0.5px solid rgba(255,255,255,0.08)",
-          borderRadius: "20px", padding: "28px", position: "relative",
-          overflow: "hidden",
+        <div className="scan-card" style={{
+          background:"var(--surface)",
+          border:"0.5px solid var(--border)",
+          borderRadius:"16px", padding:"28px",
+          position:"relative", overflow:"hidden",
         }}>
           <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: "1px",
-            background: "linear-gradient(90deg, transparent, rgba(29,158,117,0.5), transparent)",
-          }} />
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+            position:"absolute", top:0, left:0, right:0, height:"1px",
+            background:"linear-gradient(90deg, transparent, var(--green), transparent)",
+          }}/>
+          <div style={{
+            position:"absolute", bottom:-40, right:-40,
+            width:"150px", height:"150px", borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(0,229,160,0.06), transparent 70%)",
+            pointerEvents:"none",
+          }}/>
+
+          <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"4px" }}>
             <div style={{
-              width: "28px", height: "28px", borderRadius: "8px",
-              background: "rgba(29,158,117,0.15)", display: "flex",
-              alignItems: "center", justifyContent: "center", fontSize: "14px",
+              width:"32px", height:"32px", borderRadius:"8px",
+              background:"var(--green-dim)", border:"0.5px solid var(--green-border)",
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:"15px",
             }}>↗</div>
-            <span style={{ fontSize: "14px", fontWeight: "600", color: "#f0f0f8" }}>Send Remittance</span>
+            <div>
+              <div style={{ fontSize:"14px", fontWeight:"700", color:"var(--text)" }}>Send Remittance</div>
+              <div style={{ fontSize:"11px", color:"var(--text-dim)", fontFamily:"var(--font-mono)" }}>
+                ERC-20 · ON-CHAIN LOGGING
+              </div>
+            </div>
           </div>
-          <p style={{ fontSize: "12px", color: "#4b5563", marginBottom: "24px" }}>
-            Transfer mUSDC with category tagging
-          </p>
+
+          <div style={{
+            width:"100%", height:"0.5px",
+            background:"var(--border)", margin:"18px 0",
+          }}/>
+
           <SendRemittance />
         </div>
 
         {/* FAMILY DASHBOARD CARD */}
-        <div style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "0.5px solid rgba(255,255,255,0.08)",
-          borderRadius: "20px", padding: "28px", position: "relative",
-          overflow: "hidden",
+        <div className="scan-card" style={{
+          background:"var(--surface)",
+          border:"0.5px solid var(--border)",
+          borderRadius:"16px", padding:"28px",
+          position:"relative", overflow:"hidden",
         }}>
           <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: "1px",
-            background: "linear-gradient(90deg, transparent, rgba(55,138,221,0.4), transparent)",
-          }} />
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+            position:"absolute", top:0, left:0, right:0, height:"1px",
+            background:"linear-gradient(90deg, transparent, var(--blue), transparent)",
+          }}/>
+          <div style={{
+            position:"absolute", bottom:-40, right:-40,
+            width:"150px", height:"150px", borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(59,158,255,0.06), transparent 70%)",
+            pointerEvents:"none",
+          }}/>
+
+          <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"4px" }}>
             <div style={{
-              width: "28px", height: "28px", borderRadius: "8px",
-              background: "rgba(55,138,221,0.15)", display: "flex",
-              alignItems: "center", justifyContent: "center", fontSize: "14px",
+              width:"32px", height:"32px", borderRadius:"8px",
+              background:"rgba(59,158,255,0.1)", border:"0.5px solid rgba(59,158,255,0.2)",
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:"15px",
             }}>🏠</div>
-            <span style={{ fontSize: "14px", fontWeight: "600", color: "#f0f0f8" }}>Family Dashboard</span>
+            <div>
+              <div style={{ fontSize:"14px", fontWeight:"700", color:"var(--text)" }}>Family Dashboard</div>
+              <div style={{ fontSize:"11px", color:"var(--text-dim)", fontFamily:"var(--font-mono)" }}>
+                SUPABASE · REAL-TIME DATA
+              </div>
+            </div>
           </div>
-          <p style={{ fontSize: "12px", color: "#4b5563", marginBottom: "24px" }}>
-            View incoming remittances on-chain
-          </p>
+
+          <div style={{
+            width:"100%", height:"0.5px",
+            background:"var(--border)", margin:"18px 0",
+          }}/>
+
           <FamilyDashboard familyAddress="0x3A7475E964B5babE75D9a62D81f0ae8974Cc91d4" />
         </div>
       </div>
 
-      {/* FEE COMPARISON BANNER */}
-      <div style={{
-        maxWidth: "900px", margin: "16px auto 0", padding: "0 20px",
+      {/* ── FEE COMPARISON ── */}
+      <div className="fade-up fade-up-4" style={{
+        maxWidth:"920px", margin:"14px auto 0", padding:"0 40px",
       }}>
         <div style={{
-          background: "rgba(255,255,255,0.02)",
-          border: "0.5px solid rgba(255,255,255,0.07)",
-          borderRadius: "16px", padding: "20px 28px",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          flexWrap: "wrap", gap: "16px",
+          background:"var(--surface)",
+          border:"0.5px solid var(--border)",
+          borderRadius:"16px", padding:"24px 28px",
+          display:"grid",
+          gridTemplateColumns:"1fr auto 1fr auto",
+          alignItems:"center", gap:"20px",
         }}>
           <div>
-            <div style={{ fontSize: "12px", color: "#4b5563", marginBottom: "4px" }}>
-              Traditional remittance (₱48,500)
+            <div style={{
+              fontSize:"10px", fontFamily:"var(--font-mono)",
+              color:"var(--text-muted)", marginBottom:"6px", letterSpacing:"0.5px",
+            }}>WESTERN UNION / GCASH · ₱48,500</div>
+            <div style={{ fontSize:"28px", fontWeight:"800", color:"var(--red)", letterSpacing:"-1px" }}>
+              ₱1,500
             </div>
-            <div style={{ fontSize: "20px", fontWeight: "700", color: "#ef4444" }}>
-              ₱1,500 in fees
-            </div>
+            <div style={{ fontSize:"12px", color:"var(--text-dim)", marginTop:"3px" }}>in fees</div>
           </div>
+
           <div style={{
-            fontSize: "24px", color: "#374151", fontWeight: "300",
-          }}>→</div>
-          <div>
-            <div style={{ fontSize: "12px", color: "#4b5563", marginBottom: "4px" }}>
-              PadalaChain on Morph
-            </div>
-            <div style={{ fontSize: "20px", fontWeight: "700", color: "#1D9E75" }}>
-              ₱240 in fees
-            </div>
-          </div>
-          <div style={{
-            background: "rgba(29,158,117,0.1)", border: "0.5px solid rgba(29,158,117,0.2)",
-            borderRadius: "12px", padding: "12px 20px", textAlign: "center",
+            display:"flex", flexDirection:"column", alignItems:"center", gap:"4px",
           }}>
-            <div style={{ fontSize: "11px", color: "#1D9E75", marginBottom: "2px" }}>YOU SAVE</div>
-            <div style={{ fontSize: "22px", fontWeight: "700", color: "#1D9E75" }}>₱1,260</div>
+            <div style={{ fontSize:"20px", color:"var(--text-muted)" }}>→</div>
+            <div style={{
+              fontSize:"9px", fontFamily:"var(--font-mono)",
+              color:"var(--text-muted)", letterSpacing:"0.5px",
+            }}>SWITCH TO</div>
+          </div>
+
+          <div>
+            <div style={{
+              fontSize:"10px", fontFamily:"var(--font-mono)",
+              color:"var(--text-muted)", marginBottom:"6px", letterSpacing:"0.5px",
+            }}>PADALACHAIN · MORPH L2</div>
+            <div style={{ fontSize:"28px", fontWeight:"800", color:"var(--green)", letterSpacing:"-1px" }}>
+              ₱240
+            </div>
+            <div style={{ fontSize:"12px", color:"var(--text-dim)", marginTop:"3px" }}>in fees</div>
+          </div>
+
+          <div style={{
+            background:"var(--green-dim)",
+            border:"0.5px solid var(--green-border)",
+            borderRadius:"12px", padding:"16px 24px", textAlign:"center",
+            boxShadow:"0 0 24px rgba(0,229,160,0.08)",
+          }}>
+            <div style={{
+              fontSize:"10px", fontFamily:"var(--font-mono)",
+              color:"var(--green)", marginBottom:"4px", letterSpacing:"1px",
+            }}>YOU SAVE</div>
+            <div style={{ fontSize:"30px", fontWeight:"800", color:"var(--green)", letterSpacing:"-1.5px" }}>
+              ₱1,260
+            </div>
+            <div style={{ fontSize:"10px", color:"rgba(0,229,160,0.6)", marginTop:"2px" }}>per transfer</div>
           </div>
         </div>
       </div>
 
-      {/* FOOTER */}
-      <div style={{
-        textAlign: "center", marginTop: "64px",
-        fontSize: "12px", color: "#374151",
+      {/* ── HOW IT WORKS ── */}
+      <div className="fade-up fade-up-5" style={{
+        maxWidth:"920px", margin:"14px auto 0", padding:"0 40px",
       }}>
-        Built on <span style={{ color: "#1D9E75" }}>Morph Hoodi</span> · Powered by ERC-20 · Open source
+        <div style={{
+          background:"var(--surface)",
+          border:"0.5px solid var(--border)",
+          borderRadius:"16px", padding:"24px 28px",
+        }}>
+          <div style={{
+            fontSize:"10px", fontFamily:"var(--font-mono)",
+            color:"var(--text-muted)", marginBottom:"16px", letterSpacing:"1px",
+          }}>HOW IT WORKS</div>
+          <div style={{
+            display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0",
+          }}>
+            {[
+              { n:"01", label:"Connect",  desc:"MetaMask on Morph Hoodi",   icon:"🔐", color:"var(--green)" },
+              { n:"02", label:"Approve",  desc:"Authorize mUSDC spend",     icon:"✅", color:"var(--blue)"  },
+              { n:"03", label:"Send",     desc:"Tag category + on-chain tx", icon:"↗", color:"var(--amber)" },
+              { n:"04", label:"Track",    desc:"Family sees real-time logs", icon:"📊", color:"var(--pink)"  },
+            ].map((s, i) => (
+              <div key={i} style={{
+                padding:"0 20px",
+                borderRight: i < 3 ? "0.5px solid var(--border)" : "none",
+                display:"flex", flexDirection:"column", gap:"8px",
+              }}>
+                <div style={{
+                  fontSize:"10px", fontFamily:"var(--font-mono)",
+                  color: s.color, letterSpacing:"0.5px",
+                }}>{s.n}</div>
+                <div style={{ fontSize:"20px" }}>{s.icon}</div>
+                <div style={{ fontSize:"13px", fontWeight:"700", color:"var(--text)" }}>{s.label}</div>
+                <div style={{ fontSize:"11px", color:"var(--text-dim)", lineHeight:"1.5" }}>{s.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div className="fade-up fade-up-5" style={{
+        maxWidth:"920px", margin:"40px auto 0", padding:"0 40px",
+        display:"flex", alignItems:"center", justifyContent:"space-between",
+      }}>
+        <div style={{
+          fontSize:"11px", fontFamily:"var(--font-mono)",
+          color:"var(--text-muted)",
+        }}>
+          PADALACHAIN · MORPH HOODI TESTNET · 2025
+        </div>
+        <div style={{
+          display:"flex", gap:"16px",
+          fontSize:"11px", fontFamily:"var(--font-mono)", color:"var(--text-muted)",
+        }}>
+          <span>ERC-20</span>
+          <span>·</span>
+          <span>SOLIDITY 0.8.20</span>
+          <span>·</span>
+          <span>NEXT.JS 16</span>
+          <span>·</span>
+          <span>SUPABASE</span>
+        </div>
       </div>
 
     </main>
