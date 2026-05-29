@@ -6,18 +6,18 @@ import { getSignedContracts } from "../lib/contracts";
 import { supabase }           from "../lib/supabase";
 
 const CATS = [
-  { id:1, emoji:"🎓", label:"Tuition", color:"#00E5A0", bg:"rgba(0,229,160,0.1)",  border:"rgba(0,229,160,0.25)"  },
-  { id:2, emoji:"🏠", label:"Bills",   color:"#3B9EFF", bg:"rgba(59,158,255,0.1)", border:"rgba(59,158,255,0.25)" },
-  { id:3, emoji:"🍚", label:"Food",    color:"#FFB547", bg:"rgba(255,181,71,0.1)", border:"rgba(255,181,71,0.25)" },
-  { id:4, emoji:"💊", label:"Medical", color:"#FF6EB4", bg:"rgba(255,110,180,0.1)",border:"rgba(255,110,180,0.25)"},
+  { id:1, emoji:"🎓", label:"Tuition",  desc:"School fees",   color:"#00C87A", bg:"rgba(0,200,122,0.1)",  border:"rgba(0,200,122,0.3)"  },
+  { id:2, emoji:"🏠", label:"Bills",    desc:"Utilities",     color:"#3B82F6", bg:"rgba(59,130,246,0.1)", border:"rgba(59,130,246,0.3)" },
+  { id:3, emoji:"🍚", label:"Food",     desc:"Groceries",     color:"#F59E0B", bg:"rgba(245,158,11,0.1)", border:"rgba(245,158,11,0.3)" },
+  { id:4, emoji:"💊", label:"Medical",  desc:"Health needs",  color:"#EC4899", bg:"rgba(236,72,153,0.1)", border:"rgba(236,72,153,0.3)" },
 ];
 
 const inp = {
-  width:"100%", padding:"11px 14px", borderRadius:"10px",
-  border:"0.5px solid rgba(255,255,255,0.09)",
-  background:"rgba(255,255,255,0.03)",
-  color:"#F2F2FF", fontSize:"13px", marginBottom:"10px",
-  outline:"none", fontFamily:"var(--font-display)",
+  width:"100%", padding:"13px 16px", borderRadius:"12px",
+  border:"1.5px solid var(--border)",
+  background:"#F8FAFC",
+  color:"var(--text)", fontSize:"14px", marginBottom:"12px",
+  outline:"none", fontFamily:"var(--font-body)",
   transition:"all 0.2s",
 };
 
@@ -29,7 +29,7 @@ export default function SendRemittance() {
   const [status,   setStatus]   = useState("");
   const [txHash,   setTxHash]   = useState("");
   const [sending,  setSending]  = useState(false);
-  const [step,     setStep]     = useState(0); // 0=idle 1=approve 2=send 3=save 4=done
+  const [step,     setStep]     = useState(0);
 
   async function handleSend() {
     try {
@@ -70,26 +70,35 @@ export default function SendRemittance() {
   }
 
   if (!address) return (
-    <button onClick={connect} disabled={loading} style={{
-      width:"100%", padding:"14px", borderRadius:"10px",
-      background:"linear-gradient(135deg, #00E5A0, #00A373)",
-      color:"#050508", border:"none", fontSize:"14px", fontWeight:"700",
-      cursor:"pointer", letterSpacing:"-0.3px", fontFamily:"var(--font-display)",
-      boxShadow:"0 0 24px rgba(0,229,160,0.2)", transition:"all 0.2s",
-    }}>
-      {loading ? "Connecting..." : "Connect MetaMask →"}
-    </button>
+    <div>
+      <p style={{ fontSize:"13px", color:"var(--text-dim)", marginBottom:"16px", lineHeight:"1.6", fontFamily:"var(--font-body)" }}>
+        Connect your MetaMask wallet to start sending money to your family.
+      </p>
+      <button onClick={connect} disabled={loading} style={{
+        width:"100%", padding:"15px", borderRadius:"12px",
+        background:"linear-gradient(135deg, #00C87A, #009A5E)",
+        color:"#fff", border:"none", fontSize:"15px", fontWeight:"700",
+        cursor:"pointer", fontFamily:"var(--font-display)",
+        boxShadow:"0 4px 16px rgba(0,200,122,0.3)", transition:"all 0.2s",
+      }}>
+        {loading ? "Connecting..." : "🔗 Connect MetaMask"}
+      </button>
+    </div>
   );
 
   if (!isCorrectNetwork) return (
     <div style={{
-      padding:"12px 14px", borderRadius:"10px",
-      background:"rgba(255,181,71,0.08)",
-      border:"0.5px solid rgba(255,181,71,0.25)",
-      fontSize:"13px", color:"#FFB547",
-      fontFamily:"var(--font-mono)",
+      padding:"16px", borderRadius:"12px",
+      background:"rgba(245,158,11,0.08)",
+      border:"1.5px solid rgba(245,158,11,0.3)",
     }}>
-      ⚠ SWITCH TO MORPH HOODI · CHAIN 2910
+      <div style={{ fontSize:"15px", marginBottom:"6px" }}>⚠️</div>
+      <div style={{ fontSize:"14px", fontWeight:"700", color:"#B45309", marginBottom:"4px", fontFamily:"var(--font-display)" }}>
+        Wrong Network
+      </div>
+      <div style={{ fontSize:"13px", color:"#92400E", fontFamily:"var(--font-body)" }}>
+        Please switch to the Morph Hoodi network in MetaMask to continue.
+      </div>
     </div>
   );
 
@@ -97,54 +106,63 @@ export default function SendRemittance() {
 
   return (
     <div>
-      {/* Wallet */}
+      {/* Wallet indicator */}
       <div style={{
-        display:"inline-flex", alignItems:"center", gap:"7px",
-        fontSize:"11px", color:"#00E5A0",
-        background:"rgba(0,229,160,0.07)",
-        border:"0.5px solid rgba(0,229,160,0.2)",
-        padding:"5px 12px", borderRadius:"6px", marginBottom:"14px",
-        fontFamily:"var(--font-mono)",
+        display:"inline-flex", alignItems:"center", gap:"8px",
+        fontSize:"12px", color:"var(--green)",
+        background:"var(--green-light)",
+        border:"1.5px solid var(--green-border)",
+        padding:"6px 14px", borderRadius:"20px", marginBottom:"16px",
+        fontWeight:"700", fontFamily:"var(--font-body)",
       }}>
         <span style={{
-          width:"6px", height:"6px", borderRadius:"50%",
-          background:"#00E5A0", display:"inline-block",
-          boxShadow:"0 0 6px #00E5A0",
+          width:"7px", height:"7px", borderRadius:"50%",
+          background:"var(--green)", display:"inline-block",
+          boxShadow:"0 0 6px rgba(0,200,122,0.6)",
         }}/>
-        {address.slice(0,8)}...{address.slice(-6)}
+        Wallet connected: {address.slice(0,6)}...{address.slice(-4)}
       </div>
 
-      <input style={inp} placeholder="Receiver address 0x..."
+      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
+        Recipient Wallet Address
+      </label>
+      <input style={inp} placeholder="0x... (family member's address)"
         value={receiver} onChange={e => setReceiver(e.target.value)} />
 
-      <div style={{ display:"flex", gap:"8px", marginBottom:"12px" }}>
-        <input style={{...inp, marginBottom:0, flex:1}} placeholder="Amount (mUSDC)"
+      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
+        Amount to Send
+      </label>
+      <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
+        <input style={{...inp, marginBottom:0, flex:1}} placeholder="e.g. 1000"
           type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)} />
         <div style={{
-          padding:"11px 12px", borderRadius:"10px", fontSize:"12px",
-          background:"rgba(255,255,255,0.03)",
-          border:"0.5px solid rgba(255,255,255,0.09)",
-          color:"var(--text-muted)", whiteSpace:"nowrap",
-          fontFamily:"var(--font-mono)",
+          padding:"13px 14px", borderRadius:"12px", fontSize:"13px",
+          background:"#F8FAFC", border:"1.5px solid var(--border)",
+          color:"var(--text-dim)", whiteSpace:"nowrap",
+          fontFamily:"var(--font-body)", fontWeight:"600",
         }}>
           ≈ ₱{amount ? Math.round(parseFloat(amount)*57).toLocaleString() : "0"}
         </div>
       </div>
 
+      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"8px", fontFamily:"var(--font-body)" }}>
+        What is this money for?
+      </label>
       {/* Category */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"6px", marginBottom:"14px" }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"8px", marginBottom:"16px" }}>
         {CATS.map(c => (
           <button key={c.id} onClick={() => setCategory(c.id)} style={{
-            padding:"10px 4px", borderRadius:"10px", fontSize:"11px",
-            cursor:"pointer", fontFamily:"var(--font-display)", fontWeight:"600",
-            border: category===c.id ? `1px solid ${c.border}` : "0.5px solid rgba(255,255,255,0.07)",
-            background: category===c.id ? c.bg : "rgba(255,255,255,0.02)",
+            padding:"12px 6px", borderRadius:"12px", fontSize:"12px",
+            cursor:"pointer", fontFamily:"var(--font-body)", fontWeight:"700",
+            border: category===c.id ? `2px solid ${c.border}` : "1.5px solid var(--border)",
+            background: category===c.id ? c.bg : "#F8FAFC",
             color: category===c.id ? c.color : "var(--text-muted)",
             transition:"all 0.15s",
-            boxShadow: category===c.id ? `0 0 12px ${c.bg}` : "none",
+            boxShadow: category===c.id ? `0 2px 8px ${c.bg}` : "none",
           }}>
-            <div style={{ fontSize:"18px", marginBottom:"4px" }}>{c.emoji}</div>
-            {c.label}
+            <div style={{ fontSize:"22px", marginBottom:"5px" }}>{c.emoji}</div>
+            <div>{c.label}</div>
+            <div style={{ fontSize:"10px", fontWeight:"500", opacity:0.7, marginTop:"2px" }}>{c.desc}</div>
           </button>
         ))}
       </div>
@@ -153,60 +171,63 @@ export default function SendRemittance() {
       {step > 0 && (
         <div style={{
           display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"4px",
-          marginBottom:"12px",
+          marginBottom:"14px",
         }}>
-          {["Approve","Send","Save","Done"].map((s, i) => (
+          {["Approving","Sending","Saving","Done!"].map((s, i) => (
             <div key={i} style={{
-              padding:"6px", borderRadius:"6px", textAlign:"center",
-              fontSize:"10px", fontFamily:"var(--font-mono)", fontWeight:"500",
-              background: step > i ? "var(--green-dim)" : "rgba(255,255,255,0.03)",
-              border: step > i ? "0.5px solid var(--green-border)" : "0.5px solid rgba(255,255,255,0.07)",
-              color: step > i ? "#00E5A0" : "var(--text-muted)",
+              padding:"8px 4px", borderRadius:"8px", textAlign:"center",
+              fontSize:"10px", fontWeight:"700", fontFamily:"var(--font-body)",
+              background: step > i ? "var(--green-light)" : "#F8FAFC",
+              border: step > i ? "1.5px solid var(--green-border)" : "1.5px solid var(--border)",
+              color: step > i ? "var(--green)" : "var(--text-muted)",
               transition:"all 0.3s",
             }}>
-              {step > i ? "✓" : `0${i+1}`} {s}
+              {step > i ? "✓" : `${i+1}.`} {s}
             </div>
           ))}
         </div>
       )}
 
       <button onClick={handleSend} disabled={sending || !receiver || !amount} style={{
-        width:"100%", padding:"14px", borderRadius:"10px",
+        width:"100%", padding:"15px", borderRadius:"12px",
         background: sending
-          ? "rgba(0,229,160,0.15)"
-          : "linear-gradient(135deg, #00E5A0, #00A373)",
-        color: sending ? "#00E5A0" : "#050508",
-        border: sending ? "0.5px solid var(--green-border)" : "none",
-        fontSize:"14px", fontWeight:"700",
+          ? "#F0FDF4"
+          : (!receiver || !amount) ? "#F3F4F6"
+          : "linear-gradient(135deg, #00C87A, #009A5E)",
+        color: sending ? "var(--green)" : (!receiver || !amount) ? "var(--text-muted)" : "#fff",
+        border: sending ? "1.5px solid var(--green-border)" : "none",
+        fontSize:"15px", fontWeight:"700",
         cursor: (sending || !receiver || !amount) ? "default" : "pointer",
-        letterSpacing:"-0.3px", fontFamily:"var(--font-display)",
-        opacity: (!receiver || !amount) ? 0.35 : 1,
+        fontFamily:"var(--font-display)",
         transition:"all 0.2s",
-        boxShadow: (!sending && receiver && amount) ? "0 0 20px rgba(0,229,160,0.2)" : "none",
+        boxShadow: (!sending && receiver && amount) ? "0 4px 16px rgba(0,200,122,0.3)" : "none",
       }}>
-        {sending ? `Processing step ${step}/3...` : `Send on-chain → ${selectedCat?.emoji}`}
+        {sending ? `Processing… step ${step} of 3` : `Send ${selectedCat?.emoji} ${selectedCat?.label} Money →`}
       </button>
 
       {status === "done" && (
         <div style={{
-          marginTop:"12px", padding:"12px 14px", borderRadius:"10px",
-          background:"var(--green-dim)", border:"0.5px solid var(--green-border)",
-          fontSize:"13px", color:"#00E5A0", fontWeight:"600",
-          display:"flex", alignItems:"center", gap:"8px",
+          marginTop:"14px", padding:"14px 16px", borderRadius:"12px",
+          background:"var(--green-light)", border:"1.5px solid var(--green-border)",
+          fontFamily:"var(--font-body)",
         }}>
-          <span style={{ fontSize:"16px" }}>✓</span>
-          Remittance sent & saved on-chain!
+          <div style={{ fontSize:"15px", fontWeight:"800", color:"var(--green)", marginBottom:"4px", fontFamily:"var(--font-display)" }}>
+            ✓ Money sent successfully!
+          </div>
+          <div style={{ fontSize:"12px", color:"rgba(0,120,80,0.8)" }}>
+            Your family will receive it within seconds.
+          </div>
         </div>
       )}
 
       {status.startsWith("error:") && (
         <div style={{
-          marginTop:"12px", padding:"10px 14px", borderRadius:"10px",
-          background:"rgba(255,92,92,0.08)", border:"0.5px solid rgba(255,92,92,0.25)",
-          fontSize:"12px", color:"#FF5C5C",
-          fontFamily:"var(--font-mono)",
+          marginTop:"14px", padding:"12px 14px", borderRadius:"12px",
+          background:"rgba(239,68,68,0.06)", border:"1.5px solid rgba(239,68,68,0.25)",
+          fontFamily:"var(--font-body)",
         }}>
-          {status.replace("error:","")}
+          <div style={{ fontSize:"13px", fontWeight:"700", color:"#DC2626", marginBottom:"3px" }}>Something went wrong</div>
+          <div style={{ fontSize:"12px", color:"#991B1B" }}>{status.replace("error:","")}</div>
         </div>
       )}
 
@@ -214,11 +235,11 @@ export default function SendRemittance() {
         <a href={`https://explorer-hoodi.morph.network/tx/${txHash}`}
           target="_blank" style={{
             display:"flex", alignItems:"center", justifyContent:"center", gap:"6px",
-            marginTop:"10px", fontSize:"11px",
+            marginTop:"12px", fontSize:"12px",
             color:"var(--blue)", textDecoration:"none",
-            fontFamily:"var(--font-mono)",
+            fontFamily:"var(--font-body)", fontWeight:"600",
           }}>
-          {txHash.slice(0,14)}...{txHash.slice(-8)} ↗
+          🔗 View transaction on blockchain ↗
         </a>
       )}
     </div>
