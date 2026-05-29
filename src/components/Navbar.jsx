@@ -46,16 +46,16 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{
-              width: "40px", height: "40px", borderRadius: "12px",
+              width: "44px", height: "44px", borderRadius: "12px",
               background: "linear-gradient(135deg, #00B67A 0%, #008C5C 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 4px 12px rgba(0,182,122,0.35)",
               flexShrink: 0,
               overflow: "hidden",
-              padding: "4px",
+              padding: "5px",
             }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/favicon.ico" alt="PadalaChain Logo" style={{ width: "16px", height: "16px", imageRendering: "pixelated" }} />
+              <img src="/favicon.ico" alt="PadalaChain Logo" style={{ width: "34px", height: "34px", display: "block" }} />
             </div>
             <div>
               <div style={{ fontSize: "18px", fontWeight: "800", color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.4px", lineHeight: 1 }}>
