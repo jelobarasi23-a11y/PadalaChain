@@ -138,6 +138,11 @@ input:focus {
   animation: shimmer 4s linear infinite;
 }
 
+main {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 /* Tag blink */
 @keyframes blink {
   0%, 100% { opacity: 1; }
