@@ -65,7 +65,7 @@ export default function Home() {
           ⬡ HACKATHON BUILD · MORPH L2
         </div>
         <h1 className="shimmer-text" style={{
-          fontSize:"clamp(48px, 8vw, 72px)", fontWeight:"800",
+          fontSize:"clamp(36px, 5vw, 56px)", fontWeight:"800",
           lineHeight:"1.0", letterSpacing:"-3px",
           marginBottom:"20px", maxWidth:"700px",
         }}>
