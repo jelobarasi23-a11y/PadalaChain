@@ -49,10 +49,14 @@ export default function Navbar() {
               width: "40px", height: "40px", borderRadius: "12px",
               background: "linear-gradient(135deg, #00B67A 0%, #008C5C 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "20px", fontWeight: "800", color: "#fff",
               boxShadow: "0 4px 12px rgba(0,182,122,0.35)",
               flexShrink: 0,
-            }}>₱</div>
+              overflow: "hidden",
+              padding: "4px",
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-80.png" alt="PadalaChain Logo" style={{ width: "100%", height: "100%", objectFit: "contain", imageRendering: "crisp-edges" }} />
+            </div>
             <div>
               <div style={{ fontSize: "18px", fontWeight: "800", color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.4px", lineHeight: 1 }}>
                 PadalaChain
