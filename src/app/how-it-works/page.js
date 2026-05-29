@@ -1,7 +1,137 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { getSignedContracts } from "@/lib/contracts";
 
+// ─── Faucet Button Component ──────────────────────────────────────────────────
+function FaucetButton() {
+  const [status, setStatus] = useState("idle"); // idle | connecting | waiting | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleFaucet() {
+    setErrorMsg("");
+    try {
+      setStatus("connecting");
+      const { token } = await getSignedContracts();
+      setStatus("waiting");
+      const tx = await token.faucet();
+      await tx.wait();
+      setStatus("success");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err?.reason || err?.message || "Something went wrong. Please try again.");
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div style={{
+        margin: "24px 0",
+        padding: "20px 24px",
+        borderRadius: "16px",
+        background: "linear-gradient(135deg, #E8FAF2, #D1FAE5)",
+        border: "2px solid rgba(0,182,122,0.4)",
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+      }}>
+        <div style={{ fontSize: "32px" }}>🎉</div>
+        <div>
+          <div style={{ fontSize: "16px", fontWeight: "800", color: "#065F46", fontFamily: "var(--font-display)", marginBottom: "4px" }}>
+            500 mUSDC added to your wallet!
+          </div>
+          <div style={{ fontSize: "14px", color: "#047857", fontFamily: "var(--font-body)", lineHeight: "1.5" }}>
+            You&apos;re ready to move on. Click <strong>Next Step</strong> below to approve your transfer.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isLoading = status === "connecting" || status === "waiting";
+
+  const buttonLabel = {
+    idle: "💰 Get 500 Free mUSDC",
+    connecting: "Connecting wallet…",
+    waiting: "Minting tokens…",
+    error: "Try Again",
+  }[status];
+
+  return (
+    <div style={{ margin: "24px 0" }}>
+      <button
+        onClick={handleFaucet}
+        disabled={isLoading}
+        style={{
+          width: "100%",
+          padding: "16px 24px",
+          borderRadius: "14px",
+          border: "none",
+          cursor: isLoading ? "not-allowed" : "pointer",
+          background: isLoading
+            ? "linear-gradient(135deg, #9CA3AF, #6B7280)"
+            : status === "error"
+            ? "linear-gradient(135deg, #EF4444, #DC2626)"
+            : "linear-gradient(135deg, #00B67A, #008C5C)",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: "800",
+          fontFamily: "var(--font-display)",
+          boxShadow: isLoading ? "none" : "0 6px 20px rgba(0,182,122,0.35)",
+          transition: "all 0.2s",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+          letterSpacing: "-0.2px",
+        }}
+      >
+        {isLoading && (
+          <span style={{
+            width: "18px", height: "18px", borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,0.3)",
+            borderTopColor: "#fff",
+            display: "inline-block",
+            animation: "spin 0.7s linear infinite",
+          }} />
+        )}
+        {buttonLabel}
+      </button>
+
+      {status === "error" && errorMsg && (
+        <div style={{
+          marginTop: "10px",
+          padding: "12px 16px",
+          borderRadius: "10px",
+          background: "#FEF2F2",
+          border: "1.5px solid #FECACA",
+          fontSize: "13px",
+          color: "#991B1B",
+          fontFamily: "var(--font-body)",
+          lineHeight: "1.5",
+        }}>
+          ⚠️ {errorMsg}
+        </div>
+      )}
+
+      <div style={{
+        marginTop: "10px",
+        fontSize: "12px",
+        color: "var(--text-muted)",
+        fontFamily: "var(--font-body)",
+        textAlign: "center",
+        lineHeight: "1.5",
+      }}>
+        Make sure MetaMask is unlocked and set to <strong>Morph Hoodi</strong> network (Step 02)
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+// ─── Step Data ────────────────────────────────────────────────────────────────
 const STEPS = [
   {
     n: "01", icon: "🔐", label: "Install MetaMask",
@@ -20,9 +150,15 @@ const STEPS = [
   {
     n: "03", icon: "💰", label: "Get mUSDC Tokens",
     color: "#D97706", bg: "#FFFBEB", border: "rgba(217,119,6,0.3)",
-    desc: "mUSDC is the mock stablecoin used on PadalaChain. For the demo, you can mint free test tokens using the faucet function in Remix. Each faucet call gives you 500 mUSDC.",
-    tip: "This is testnet — no real money involved. Perfect for trying it out.",
-    substeps: ["Open Remix IDE (remix.ethereum.org)", "Connect MetaMask to Remix", "Find PadalaToken contract", "Call the faucet() function"],
+    desc: "Before you can send money, you need test tokens in your wallet. Click the button below to get 500 free mUSDC instantly — no Remix IDE or developer tools needed.",
+    tip: "mUSDC is fake money used for testing. You can click this as many times as you want — nothing real is at stake.",
+    substeps: [
+      "Make sure MetaMask is connected (Steps 1 & 2 done ✓)",
+      "Click the green 'Get 500 Free mUSDC' button below",
+      "A MetaMask popup will appear — click Confirm",
+      "Done! Your wallet now has test tokens",
+    ],
+    hasFaucet: true,
   },
   {
     n: "04", icon: "✅", label: "Approve the Transfer",
@@ -47,6 +183,7 @@ const STEPS = [
   },
 ];
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function HowItWorksPage() {
   const [activeStep, setActiveStep] = useState(0);
   const step = STEPS[activeStep];
@@ -139,6 +276,9 @@ export default function HowItWorksPage() {
                 ))}
               </div>
             </div>
+
+            {/* Inline Faucet Button for Step 03 */}
+            {step.hasFaucet && <FaucetButton />}
 
             {/* Tip */}
             <div style={{ padding: "16px 20px", borderRadius: "14px", background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
