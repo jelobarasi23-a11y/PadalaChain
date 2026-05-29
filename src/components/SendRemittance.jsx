@@ -1,247 +1,221 @@
 "use client";
 import { useState } from "react";
-import { ethers }  from "ethers";
-import { useWallet }          from "../hooks/useWallet";
-import { getSignedContracts } from "../lib/contracts";
-import { supabase }           from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
-const CATS = [
-  { id:1, emoji:"🎓", label:"Tuition",  desc:"School fees",   color:"#00C87A", bg:"rgba(0,200,122,0.1)",  border:"rgba(0,200,122,0.3)"  },
-  { id:2, emoji:"🏠", label:"Bills",    desc:"Utilities",     color:"#3B82F6", bg:"rgba(59,130,246,0.1)", border:"rgba(59,130,246,0.3)" },
-  { id:3, emoji:"🍚", label:"Food",     desc:"Groceries",     color:"#F59E0B", bg:"rgba(245,158,11,0.1)", border:"rgba(245,158,11,0.3)" },
-  { id:4, emoji:"💊", label:"Medical",  desc:"Health needs",  color:"#EC4899", bg:"rgba(236,72,153,0.1)", border:"rgba(236,72,153,0.3)" },
-];
-
-const inp = {
-  width:"100%", padding:"13px 16px", borderRadius:"12px",
-  border:"1.5px solid var(--border)",
-  background:"#F8FAFC",
-  color:"var(--text)", fontSize:"14px", marginBottom:"12px",
-  outline:"none", fontFamily:"var(--font-body)",
-  transition:"all 0.2s",
+const CAT = {
+  1:{ label:"Tuition", emoji:"🎓", color:"#00C87A", bg:"rgba(0,200,122,0.1)",  border:"rgba(0,200,122,0.25)"   },
+  2:{ label:"Bills",   emoji:"🏠", color:"#3B82F6", bg:"rgba(59,130,246,0.1)", border:"rgba(59,130,246,0.25)"  },
+  3:{ label:"Food",    emoji:"🍚", color:"#F59E0B", bg:"rgba(245,158,11,0.1)", border:"rgba(245,158,11,0.25)"  },
+  4:{ label:"Medical", emoji:"💊", color:"#EC4899", bg:"rgba(236,72,153,0.1)", border:"rgba(236,72,153,0.25)" },
 };
 
-export default function SendRemittance() {
-  const { address, isCorrectNetwork, connect, loading } = useWallet();
-  const [receiver, setReceiver] = useState("");
-  const [amount,   setAmount]   = useState("");
-  const [category, setCategory] = useState(1);
-  const [status,   setStatus]   = useState("");
-  const [txHash,   setTxHash]   = useState("");
-  const [sending,  setSending]  = useState(false);
-  const [step,     setStep]     = useState(0);
+const FAMILY_ADDRESS = "0x3A7475E964B5babE75D9a62D81f0ae8974Cc91d4";
 
-  async function handleSend() {
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60) return "Just now";
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return new Date(dateStr).toLocaleDateString("en-PH", { month:"short", day:"numeric" });
+}
+
+export default function FamilyDashboard({ familyAddress = FAMILY_ADDRESS }) {
+  const [logs,    setLogs]    = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loaded,  setLoaded]  = useState(false);
+  const [error,   setError]   = useState("");
+
+  async function fetchLogs() {
+    setLoading(true); setError("");
     try {
-      setSending(true); setStatus(""); setTxHash(""); setStep(1);
-      const { token, remittance } = await getSignedContracts();
-      const amt = ethers.parseUnits(amount, 18);
+      const { data, error: err } = await supabase
+        .from("remittances")
+        .select("*")
+        .eq("receiver", familyAddress.toLowerCase())
+        .order("created_at", { ascending: false });
 
-      setStep(1);
-      await (await token.approve(
-        process.env.NEXT_PUBLIC_REMITTANCE_ADDRESS, amt
-      )).wait();
-
-      setStep(2);
-      const tx = await remittance.sendRemittance(receiver, amt, category);
-      const receipt = await tx.wait();
-
-      setStep(3);
-      const catLabel = CATS.find(c => c.id === category)?.label || "Other";
-      await supabase.from("remittances").insert({
-        tx_hash:         receipt.hash,
-        sender:          address.toLowerCase(),
-        receiver:        receiver.toLowerCase(),
-        amount:          parseFloat(amount),
-        category,
-        category_label:  catLabel,
-        timestamp_chain: Math.floor(Date.now() / 1000),
-      });
-
-      setStep(4);
-      setTxHash(receipt.hash);
-      setStatus("done");
-      setReceiver(""); setAmount("");
-      setTimeout(() => setStep(0), 4000);
-    } catch (e) {
-      setStatus("error:" + (e.reason || e.message));
-      setStep(0);
-    } finally { setSending(false); }
+      if (err) throw err;
+      setLogs(data);
+      setLoaded(true);
+    } catch(e) {
+      setError(e.message);
+    } finally { setLoading(false); }
   }
 
-  if (!address) return (
-    <div>
-      <p style={{ fontSize:"13px", color:"var(--text-dim)", marginBottom:"16px", lineHeight:"1.6", fontFamily:"var(--font-body)" }}>
-        Connect your MetaMask wallet to start sending money to your family.
-      </p>
-      <button onClick={connect} disabled={loading} style={{
-        width:"100%", padding:"15px", borderRadius:"12px",
-        background:"linear-gradient(135deg, #00C87A, #009A5E)",
-        color:"#fff", border:"none", fontSize:"15px", fontWeight:"700",
-        cursor:"pointer", fontFamily:"var(--font-display)",
-        boxShadow:"0 4px 16px rgba(0,200,122,0.3)", transition:"all 0.2s",
-      }}>
-        {loading ? "Connecting..." : "🔗 Connect MetaMask"}
-      </button>
-    </div>
-  );
+  const total = logs.reduce((sum, l) => sum + parseFloat(l.amount || 0), 0);
 
-  if (!isCorrectNetwork) return (
-    <div style={{
-      padding:"16px", borderRadius:"12px",
-      background:"rgba(245,158,11,0.08)",
-      border:"1.5px solid rgba(245,158,11,0.3)",
-    }}>
-      <div style={{ fontSize:"15px", marginBottom:"6px" }}>⚠️</div>
-      <div style={{ fontSize:"14px", fontWeight:"700", color:"#B45309", marginBottom:"4px", fontFamily:"var(--font-display)" }}>
-        Wrong Network
-      </div>
-      <div style={{ fontSize:"13px", color:"#92400E", fontFamily:"var(--font-body)" }}>
-        Please switch to the Morph Hoodi network in MetaMask to continue.
-      </div>
-    </div>
-  );
-
-  const selectedCat = CATS.find(c => c.id === category);
+  const breakdown = [1,2,3,4].map(id => ({
+    ...CAT[id],
+    id,
+    count: logs.filter(l => l.category === id).length,
+    sum:   logs.filter(l => l.category === id).reduce((s,l) => s + parseFloat(l.amount||0), 0),
+  })).filter(c => c.count > 0);
 
   return (
     <div>
-      {/* Wallet indicator */}
-      <div style={{
-        display:"inline-flex", alignItems:"center", gap:"8px",
-        fontSize:"12px", color:"var(--green)",
-        background:"var(--green-light)",
-        border:"1.5px solid var(--green-border)",
-        padding:"6px 14px", borderRadius:"20px", marginBottom:"16px",
-        fontWeight:"700", fontFamily:"var(--font-body)",
-      }}>
-        <span style={{
-          width:"7px", height:"7px", borderRadius:"50%",
-          background:"var(--green)", display:"inline-block",
-          boxShadow:"0 0 6px rgba(0,200,122,0.6)",
-        }}/>
-        Wallet connected: {address.slice(0,6)}...{address.slice(-4)}
-      </div>
-
-      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
-        Recipient Wallet Address
-      </label>
-      <input style={inp} placeholder="0x... (family member's address)"
-        value={receiver} onChange={e => setReceiver(e.target.value)} />
-
-      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
-        Amount to Send
-      </label>
-      <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
-        <input style={{...inp, marginBottom:0, flex:1}} placeholder="e.g. 1000"
-          type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)} />
-        <div style={{
-          padding:"13px 14px", borderRadius:"12px", fontSize:"13px",
-          background:"#F8FAFC", border:"1.5px solid var(--border)",
-          color:"var(--text-dim)", whiteSpace:"nowrap",
-          fontFamily:"var(--font-body)", fontWeight:"600",
-        }}>
-          ≈ ₱{amount ? Math.round(parseFloat(amount)*57).toLocaleString() : "0"}
-        </div>
-      </div>
-
-      <label style={{ display:"block", fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"8px", fontFamily:"var(--font-body)" }}>
-        What is this money for?
-      </label>
-      {/* Category */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"8px", marginBottom:"16px" }}>
-        {CATS.map(c => (
-          <button key={c.id} onClick={() => setCategory(c.id)} style={{
-            padding:"12px 6px", borderRadius:"12px", fontSize:"12px",
-            cursor:"pointer", fontFamily:"var(--font-body)", fontWeight:"700",
-            border: category===c.id ? `2px solid ${c.border}` : "1.5px solid var(--border)",
-            background: category===c.id ? c.bg : "#F8FAFC",
-            color: category===c.id ? c.color : "var(--text-muted)",
-            transition:"all 0.15s",
-            boxShadow: category===c.id ? `0 2px 8px ${c.bg}` : "none",
-          }}>
-            <div style={{ fontSize:"22px", marginBottom:"5px" }}>{c.emoji}</div>
-            <div>{c.label}</div>
-            <div style={{ fontSize:"10px", fontWeight:"500", opacity:0.7, marginTop:"2px" }}>{c.desc}</div>
-          </button>
-        ))}
-      </div>
-
-      {/* Progress steps */}
-      {step > 0 && (
-        <div style={{
-          display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"4px",
-          marginBottom:"14px",
-        }}>
-          {["Approving","Sending","Saving","Done!"].map((s, i) => (
-            <div key={i} style={{
-              padding:"8px 4px", borderRadius:"8px", textAlign:"center",
-              fontSize:"10px", fontWeight:"700", fontFamily:"var(--font-body)",
-              background: step > i ? "var(--green-light)" : "#F8FAFC",
-              border: step > i ? "1.5px solid var(--green-border)" : "1.5px solid var(--border)",
-              color: step > i ? "var(--green)" : "var(--text-muted)",
-              transition:"all 0.3s",
+      {/* Summary */}
+      {loaded && logs.length > 0 && (
+        <>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"14px" }}>
+            <div style={{
+              background:"var(--green-light)", border:"1.5px solid var(--green-border)",
+              borderRadius:"14px", padding:"16px",
             }}>
-              {step > i ? "✓" : `${i+1}.`} {s}
+              <div style={{ fontSize:"11px", fontWeight:"700", color:"rgba(0,150,80,0.7)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
+                💰 TOTAL RECEIVED
+              </div>
+              <div style={{ fontSize:"24px", fontWeight:"800", color:"var(--green)", letterSpacing:"-0.5px", fontFamily:"var(--font-display)" }}>
+                {total.toFixed(0)} <span style={{ fontSize:"13px", fontWeight:"600" }}>mUSDC</span>
+              </div>
             </div>
-          ))}
-        </div>
+            <div style={{
+              background:"rgba(59,130,246,0.08)", border:"1.5px solid rgba(59,130,246,0.2)",
+              borderRadius:"14px", padding:"16px",
+            }}>
+              <div style={{ fontSize:"11px", fontWeight:"700", color:"rgba(37,99,235,0.7)", marginBottom:"6px", fontFamily:"var(--font-body)" }}>
+                📦 TRANSFERS
+              </div>
+              <div style={{ fontSize:"24px", fontWeight:"800", color:"var(--blue)", letterSpacing:"-0.5px", fontFamily:"var(--font-display)" }}>
+                {logs.length}
+              </div>
+            </div>
+          </div>
+
+          {/* Breakdown bars */}
+          {breakdown.length > 0 && (
+            <div style={{
+              background:"#F8FAFC", border:"1.5px solid var(--border)",
+              borderRadius:"14px", padding:"14px 16px", marginBottom:"14px",
+            }}>
+              <div style={{ fontSize:"12px", fontWeight:"700", color:"var(--text-dim)", marginBottom:"12px", fontFamily:"var(--font-body)" }}>
+                Spending Breakdown
+              </div>
+              <div style={{ display:"grid", gap:"10px" }}>
+                {breakdown.map(c => (
+                  <div key={c.id}>
+                    <div style={{ display:"flex", justifyContent:"space-between", fontSize:"12px", marginBottom:"5px" }}>
+                      <span style={{ color:"var(--text-dim)", fontWeight:"600", fontFamily:"var(--font-body)" }}>{c.emoji} {c.label}</span>
+                      <span style={{ color:c.color, fontWeight:"700", fontFamily:"var(--font-display)" }}>
+                        {c.sum.toFixed(0)} mUSDC
+                      </span>
+                    </div>
+                    <div style={{ height:"6px", background:"var(--border)", borderRadius:"3px", overflow:"hidden" }}>
+                      <div className="progress-bar" style={{
+                        height:"100%", borderRadius:"3px",
+                        background:`linear-gradient(90deg, ${c.color}aa, ${c.color})`,
+                        width:`${total > 0 ? (c.sum/total*100).toFixed(0) : 0}%`,
+                        boxShadow:`0 0 8px ${c.color}44`,
+                        transition:"width 0.8s ease",
+                      }}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
-      <button onClick={handleSend} disabled={sending || !receiver || !amount} style={{
-        width:"100%", padding:"15px", borderRadius:"12px",
-        background: sending
-          ? "#F0FDF4"
-          : (!receiver || !amount) ? "#F3F4F6"
-          : "linear-gradient(135deg, #00C87A, #009A5E)",
-        color: sending ? "var(--green)" : (!receiver || !amount) ? "var(--text-muted)" : "#fff",
-        border: sending ? "1.5px solid var(--green-border)" : "none",
-        fontSize:"15px", fontWeight:"700",
-        cursor: (sending || !receiver || !amount) ? "default" : "pointer",
-        fontFamily:"var(--font-display)",
+      <button onClick={fetchLogs} disabled={loading} style={{
+        width:"100%", padding:"13px", borderRadius:"12px",
+        background: loaded ? "#F8FAFC" : "rgba(59,130,246,0.08)",
+        color:"var(--blue)",
+        border:"1.5px solid rgba(59,130,246,0.3)",
+        fontSize:"14px", fontWeight:"700", cursor:"pointer",
+        marginBottom:"14px", fontFamily:"var(--font-display)",
         transition:"all 0.2s",
-        boxShadow: (!sending && receiver && amount) ? "0 4px 16px rgba(0,200,122,0.3)" : "none",
       }}>
-        {sending ? `Processing… step ${step} of 3` : `Send ${selectedCat?.emoji} ${selectedCat?.label} Money →`}
+        {loading ? "⏳ Loading transfers..." : loaded ? "↻ Refresh" : "📥 Load Transfer History"}
       </button>
 
-      {status === "done" && (
+      {error && (
         <div style={{
-          marginTop:"14px", padding:"14px 16px", borderRadius:"12px",
-          background:"var(--green-light)", border:"1.5px solid var(--green-border)",
-          fontFamily:"var(--font-body)",
+          padding:"12px 14px", borderRadius:"12px",
+          background:"rgba(239,68,68,0.06)", border:"1.5px solid rgba(239,68,68,0.2)",
+          fontFamily:"var(--font-body)", marginBottom:"12px",
         }}>
-          <div style={{ fontSize:"15px", fontWeight:"800", color:"var(--green)", marginBottom:"4px", fontFamily:"var(--font-display)" }}>
-            ✓ Money sent successfully!
+          <div style={{ fontSize:"13px", fontWeight:"700", color:"#DC2626", marginBottom:"3px" }}>Unable to load transfers</div>
+          <div style={{ fontSize:"12px", color:"#991B1B" }}>{error}</div>
+        </div>
+      )}
+
+      {loaded && logs.length === 0 && !error && (
+        <div style={{
+          padding:"32px", textAlign:"center",
+          border:"1.5px dashed var(--border)", borderRadius:"14px",
+          background:"#FAFAFA",
+        }}>
+          <div style={{ fontSize:"32px", marginBottom:"10px" }}>📭</div>
+          <div style={{ fontSize:"14px", fontWeight:"700", color:"var(--text)", marginBottom:"5px", fontFamily:"var(--font-display)" }}>
+            No transfers yet
           </div>
-          <div style={{ fontSize:"12px", color:"rgba(0,120,80,0.8)" }}>
-            Your family will receive it within seconds.
+          <div style={{ fontSize:"12px", color:"var(--text-muted)", fontFamily:"var(--font-body)" }}>
+            Once someone sends money here, it will appear in this list.
           </div>
         </div>
       )}
 
-      {status.startsWith("error:") && (
-        <div style={{
-          marginTop:"14px", padding:"12px 14px", borderRadius:"12px",
-          background:"rgba(239,68,68,0.06)", border:"1.5px solid rgba(239,68,68,0.25)",
-          fontFamily:"var(--font-body)",
-        }}>
-          <div style={{ fontSize:"13px", fontWeight:"700", color:"#DC2626", marginBottom:"3px" }}>Something went wrong</div>
-          <div style={{ fontSize:"12px", color:"#991B1B" }}>{status.replace("error:","")}</div>
-        </div>
-      )}
+      <div style={{ display:"grid", gap:"10px" }}>
+        {logs.map((l, i) => {
+          const c = CAT[l.category] || CAT[1];
+          return (
+            <div key={i} style={{
+              background:"#FAFAFA",
+              border:`1.5px solid ${c.border}`,
+              borderRadius:"14px", padding:"14px 16px",
+              display:"flex", alignItems:"center", gap:"14px",
+              transition:"all 0.15s",
+            }}>
+              <div style={{
+                width:"44px", height:"44px", borderRadius:"12px",
+                background:c.bg, border:`1.5px solid ${c.border}`,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:"20px", flexShrink:0,
+              }}>{c.emoji}</div>
 
-      {txHash && (
-        <a href={`https://explorer-hoodi.morph.network/tx/${txHash}`}
-          target="_blank" style={{
-            display:"flex", alignItems:"center", justifyContent:"center", gap:"6px",
-            marginTop:"12px", fontSize:"12px",
-            color:"var(--blue)", textDecoration:"none",
-            fontFamily:"var(--font-body)", fontWeight:"600",
-          }}>
-          🔗 View transaction on blockchain ↗
-        </a>
-      )}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"4px" }}>
+                  <span style={{
+                    fontSize:"15px", fontWeight:"800",
+                    color:"var(--text)", fontFamily:"var(--font-display)",
+                  }}>
+                    {parseFloat(l.amount).toFixed(0)}
+                    <span style={{ fontSize:"11px", fontWeight:"600", color:"var(--text-muted)", marginLeft:"4px" }}>mUSDC</span>
+                  </span>
+                  <span style={{
+                    fontSize:"11px", color:c.color, background:c.bg,
+                    padding:"2px 10px", borderRadius:"20px",
+                    fontWeight:"700", fontFamily:"var(--font-body)",
+                  }}>{c.label}</span>
+                </div>
+                <div style={{
+                  fontSize:"11px", color:"var(--text-muted)",
+                  fontFamily:"var(--font-body)", fontWeight:"500",
+                }}>
+                  From {l.sender?.slice(0,6)}...{l.sender?.slice(-4)} · {timeAgo(l.created_at)}
+                </div>
+                {l.tx_hash && (
+                  <a href={`https://explorer-hoodi.morph.network/tx/${l.tx_hash}`}
+                    target="_blank" style={{
+                      fontSize:"11px", color:"var(--blue)",
+                      textDecoration:"none", fontFamily:"var(--font-body)",
+                      display:"block", marginTop:"3px", fontWeight:"600",
+                    }}>
+                    🔗 View receipt ↗
+                  </a>
+                )}
+              </div>
+
+              <div style={{
+                fontSize:"15px", fontWeight:"800",
+                color:c.color, flexShrink:0, fontFamily:"var(--font-display)",
+              }}>
+                +{parseFloat(l.amount).toFixed(0)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
