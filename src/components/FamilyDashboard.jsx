@@ -16,6 +16,7 @@ export default function FamilyDashboard({ familyAddress }) {
   const [error,   setError]   = useState("");
 
   async function fetchLogs() {
+    if (!supabase) { setError("Supabase not configured"); return; }
     setLoading(true); setError("");
     try {
       const { data, error: err } = await supabase
